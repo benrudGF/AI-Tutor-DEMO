@@ -51,6 +51,29 @@
             margin-top: 10px;
         }
         .btn:hover { background: #0056b3; }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+            min-height: 80px;
+            box-sizing: border-box;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.15);
+        }
+        label {
+            display: block;
+            margin-top: 16px;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -66,14 +89,16 @@
 
     echo '<div class="result info"><strong>Status:</strong> GROQ_API_KEY is present.</div>';
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $userPrompt = isset($_POST['prompt']) ? trim($_POST['prompt']) : '';
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $userPrompt !== '') {
         $url = 'https://api.groq.com/openai/v1/chat/completions';
         $data = json_encode([
             'model' => 'llama-3.1-8b-instant',
             'messages' => [
-                ['role' => 'user', 'content' => 'Say "Hello! Your Groq API key is working." and nothing else.']
+                ['role' => 'user', 'content' => $userPrompt]
             ],
-            'max_tokens' => 50
+            'max_tokens' => 1024
         ]);
 
         $ch = curl_init($url);
@@ -100,9 +125,9 @@
             $message = $result['choices'][0]['message']['content'] ?? 'No response content';
             $model = $result['model'] ?? 'unknown';
             echo '<div class="result success">';
-            echo '<strong>Success!</strong> API key is valid and working.<br><br>';
-            echo '<strong>Model:</strong> ' . htmlspecialchars($model) . '<br>';
-            echo '<strong>Response:</strong> ' . htmlspecialchars($message);
+            echo '<strong>Model:</strong> ' . htmlspecialchars($model) . '<br><br>';
+            echo '<strong>Your prompt:</strong> ' . htmlspecialchars($userPrompt) . '<br><br>';
+            echo '<strong>Response:</strong><br>' . nl2br(htmlspecialchars($message));
             echo '</div>';
         } else {
             $result = json_decode($response, true);
@@ -113,7 +138,11 @@
             echo '</div>';
         }
     } else {
-        echo '<form method="POST"><button type="submit" class="btn">Run API Test</button></form>';
+        echo '<form method="POST">';
+        echo '<label for="prompt">Enter your prompt:</label>';
+        echo '<textarea name="prompt" id="prompt" placeholder="Type your message here...">' . htmlspecialchars($userPrompt) . '</textarea>';
+        echo '<button type="submit" class="btn">Send to Groq</button>';
+        echo '</form>';
     }
     ?>
 </body>
