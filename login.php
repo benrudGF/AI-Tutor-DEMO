@@ -2,6 +2,10 @@
 $title = "Login";
 require 'db.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -12,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user && password_verify($password, $user['password_hash'])) {
         $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['login_password'] = $password;
         $_SESSION['login_message'] = "You have successfully logged in!";
         header("Location: index.php");
         exit();
