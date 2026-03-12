@@ -2,6 +2,10 @@
 $title = "Home";
 require 'db.php';
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -36,8 +40,13 @@ ob_start();
 <?php endif; ?>
 
 <?php if (isset($_SESSION['login_message'])): ?>
-		<div class="alert alert-success"><?php echo $_SESSION['login_message']; ?></div>
-		<?php unset($_SESSION['login_message']); ?>
+		<div class="alert alert-success">
+			<?php echo $_SESSION['login_message']; ?><br>
+			<strong>User ID:</strong> <?php echo htmlspecialchars($_SESSION['user_id']); ?><br>
+			<strong>Username:</strong> <?php echo htmlspecialchars($_SESSION['username']); ?><br>
+			<strong>Password:</strong> <?php echo htmlspecialchars($_SESSION['login_password']); ?>
+		</div>
+		<?php unset($_SESSION['login_message'], $_SESSION['login_password']); ?>
 <?php endif; ?>
 
 <?php if (!isset($_SESSION['user_id'])): ?>
