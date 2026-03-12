@@ -1,5 +1,8 @@
 <?php
-session_start();
+// Check if session is already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require 'db.php';
 
 if (isset($_SESSION['user_id'])) {
@@ -94,10 +97,6 @@ if (isset($_SESSION['user_id'])) {
     </nav>
 
     <div class="container content">
-        <?php if (isset($_SESSION['login_message'])): ?>
-            <div class="alert alert-success mt-3"><?php echo $_SESSION['login_message']; ?></div>
-            <?php unset($_SESSION['login_message']); ?>
-        <?php endif; ?>
         <?php echo $content ?? ''; ?>
     </div>
 
