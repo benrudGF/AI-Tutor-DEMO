@@ -15,6 +15,18 @@ ob_start();
             <div class="card-body">
                 <form id="promptForm">
                     <div class="mb-3">
+                        <label for="tutorSelect" class="form-label">Choose your tutor</label>
+                        <select class="form-select" id="tutorSelect" name="tutor">
+                            <option value="general">General Tutor</option>
+                            <option value="socratic">Socratic Guide</option>
+                            <option value="math">Math Tutor</option>
+                            <option value="science">Science Tutor</option>
+                            <option value="writing">Writing Coach</option>
+                            <option value="coding">Coding Mentor</option>
+                            <option value="history">History Tutor</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label for="userMessage" class="form-label">Ask a question</label>
                         <textarea class="form-control" id="userMessage" name="message" rows="3" placeholder="Type your question here..." required></textarea>
                     </div>
@@ -39,6 +51,7 @@ document.getElementById('promptForm').addEventListener('submit', function(e) {
     const message = document.getElementById('userMessage').value.trim();
     if (!message) return;
 
+    const tutor = document.getElementById('tutorSelect').value;
     const submitBtn = document.getElementById('submitBtn');
     const responseArea = document.getElementById('responseArea');
     const responseContent = document.getElementById('responseContent');
@@ -53,7 +66,7 @@ document.getElementById('promptForm').addEventListener('submit', function(e) {
     fetch('api_handler.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: message })
+        body: JSON.stringify({ message: message, tutor: tutor })
     })
     .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
     .then(function(result) {

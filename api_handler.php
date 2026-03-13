@@ -19,6 +19,7 @@ header('Content-Type: application/json');
 
 $input = json_decode(file_get_contents('php://input'), true);
 $userMessage = trim($input['message'] ?? '');
+$tutorType = $input['tutor'] ?? 'general';
 
 if ($userMessage === '') {
     http_response_code(400);
@@ -33,10 +34,22 @@ if (!$apiKey) {
     exit();
 }
 
+$tutorPrompts = [
+    'general' => 'You are a helpful AI tutor. Explain concepts clearly and encourage the student to think critically.',
+    'socratic' => 'You are a Socratic tutor. Never give direct answers. Instead, guide the student by asking thoughtful questions that lead them to discover the answer on their own. Be patient and encouraging.',
+    'math' => 'You are a math tutor. Break down problems step by step. Use clear notation. When the student makes an error, identify the specific step where they went wrong and explain why.',
+    'science' => 'You are a science tutor. Explain scientific concepts using real-world examples and analogies. Encourage curiosity and connect ideas to everyday phenomena.',
+    'writing' => 'You are a writing coach. Help the student improve their writing by focusing on clarity, structure, and voice. Give specific, actionable feedback rather than vague praise. Ask questions about their intended audience and purpose.',
+    'coding' => 'You are a coding mentor. Help the student learn to code by explaining concepts clearly, reviewing their code, and suggesting improvements. Encourage good practices like readable variable names and breaking problems into smaller parts. When showing code, explain the reasoning behind each step.',
+    'history' => 'You are a history tutor. Bring historical events to life by connecting them to causes, consequences, and human experiences. Encourage the student to analyze primary sources and consider multiple perspectives.',
+];
+
+$systemPrompt = $tutorPrompts[$tutorType] ?? $tutorPrompts['general'];
+
 $payload = json_encode([
     'model' => 'llama-3.1-8b-instant',
     'messages' => [
-        ['role' => 'system', 'content' => 'You are a helpful AI tutor.'],
+        ['role' => 'system', 'content' => $systemPrompt],
         ['role' => 'user', 'content' => $userMessage],
     ],
     'temperature' => 0.7,
