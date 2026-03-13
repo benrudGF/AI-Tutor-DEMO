@@ -58,8 +58,6 @@ ob_start();
                             <option value="Mr. Rogers">Mr. Rogers</option>
                         </select>
                     </div>
-
-
                     <div class="mb-3">
                         <label for="userMessage" class="form-label">Ask a question</label>
                         <textarea class="form-control" id="userMessage" name="message" rows="3" placeholder="Type your question here..." required></textarea>
@@ -82,12 +80,12 @@ ob_start();
 document.getElementById('promptForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    const gradeRange = document.getElementById('gradeRange').value.trim();
-    const subject = document.getElementById('subject').value.trim();
+    const gradeRange = document.getElementById('gradeRange').value;
+    const subject = document.getElementById('subject').value;
+    const voice = document.getElementById('voice').value;
     const message = document.getElementById('userMessage').value.trim();
-    if (!gradeRange || !subject || !message) return;
+    if (!gradeRange || !subject || !voice || !message) return;
 
-    const tutor = document.getElementById('tutorSelect').value;
     const submitBtn = document.getElementById('submitBtn');
     const responseArea = document.getElementById('responseArea');
     const responseContent = document.getElementById('responseContent');
@@ -105,6 +103,7 @@ document.getElementById('promptForm').addEventListener('submit', function(e) {
         body: JSON.stringify({
             gradeRange: gradeRange,
             subject: subject,
+            voice: voice,
             message: message
         })
     })
