@@ -132,7 +132,7 @@ Key parameters sent to Groq:
 - `max_tokens`: `1024`
 - `messages`: array of `{role, content}` objects
 
-The frontend sends `{ message, tutor }` in the POST body. The `tutor` field selects a persona from the `$tutorPrompts` map in `api_handler.php`, which sets the system prompt. Available tutors: `general`, `socratic`, `math`, `science`, `writing`, `coding`, `history`. To add a new tutor, add an entry to the `$tutorPrompts` array in `api_handler.php` and a matching `<option>` in `prompt.php`.
+The frontend sends `{ gradeRange, subject, voice, message }` in the POST body. The backend uses all three selection fields to build a dynamic system prompt: `"You are a helpful AI tutor specializing in {subject} for {gradeRange} school students. Answer all questions in the voice of: {voice}."` To add a new voice, subject, or grade range, add a matching `<option>` in `prompt.php`.
 
 The response is returned as JSON to the frontend, which renders it dynamically via vanilla JS `fetch()`.
 
