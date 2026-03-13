@@ -87,6 +87,7 @@ document.getElementById('promptForm').addEventListener('submit', function(e) {
     const message = document.getElementById('userMessage').value.trim();
     if (!gradeRange || !subject || !message) return;
 
+    const tutor = document.getElementById('tutorSelect').value;
     const submitBtn = document.getElementById('submitBtn');
     const responseArea = document.getElementById('responseArea');
     const responseContent = document.getElementById('responseContent');
