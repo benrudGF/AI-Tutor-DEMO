@@ -18,11 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 header('Content-Type: application/json');
 
 $input = json_decode(file_get_contents('php://input'), true);
+$gradeRange = trim($input['gradeRange'] ?? '');
+$subject = trim($input['subject'] ?? '');
 $userMessage = trim($input['message'] ?? '');
 
-if ($userMessage === '') {
+if ($userMessage === '' || $subject === '' || $gradeRange === '') {
     http_response_code(400);
-    echo json_encode(['error' => 'Message is required']);
+    echo json_encode(['error' => 'Message, subject, and grade range are required']);
     exit();
 }
 
@@ -36,7 +38,7 @@ if (!$apiKey) {
 $payload = json_encode([
     'model' => 'llama-3.1-8b-instant',
     'messages' => [
-        ['role' => 'system', 'content' => 'You are a helpful AI tutor.'],
+        ['role' => 'system', 'content' => 'You are a helpful AI tutor specializing in ' . $subject . ' for ' . $gradeRange . ' school students. Answer all questions in the voice of: Mickey Mouse.'],
         ['role' => 'user', 'content' => $userMessage],
     ],
     'temperature' => 0.7,
