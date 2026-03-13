@@ -15,17 +15,51 @@ ob_start();
             <div class="card-body">
                 <form id="promptForm">
                     <div class="mb-3">
-                        <label for="tutorSelect" class="form-label">Choose your tutor</label>
-                        <select class="form-select" id="tutorSelect" name="tutor">
-                            <option value="general">General Tutor</option>
-                            <option value="socratic">Socratic Guide</option>
-                            <option value="math">Math Tutor</option>
-                            <option value="science">Science Tutor</option>
-                            <option value="writing">Writing Coach</option>
-                            <option value="coding">Coding Mentor</option>
-                            <option value="history">History Tutor</option>
+                        <label for="gradeRange" class="form-label">Grade Range</label>
+                        <select class="form-select" id="gradeRange" name="gradeRange" required>
+                            <option value="" selected disabled>Select a grade range</option>
+                            <option value="kindergarden">Kindergarden School</option>
+                            <option value="grade">Grade School</option>
+                            <option value="middle">Middle School</option>
+                            <option value="high">High School</option>
+                            <option value="college">College</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <select class="form-select" id="subject" name="subject" required>
+                            <option value="" selected disabled>Select a subject</option>
+                            <option value="english">English</option>
+                            <option value="math">Math</option>
+                            <option value="history">History</option>
+                            <option value="science">Science</option>
+                            <option value="business">Business</option>
+                            <option value="technology">Technology</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="voice" class="form-label">Voice</label>
+                        <select class="form-select" id="voice" name="voice" required>
+                            <option value="" selected disabled>Select a voice</option>
+                            <option value="Mickey Mouse">Mickey Mouse</option>
+                            <option value="Superman">Superman</option>
+                            <option value="Darth Vader">Darth Vader</option>
+                            <option value="Yoda">Yoda</option>
+                            <option value="SpongeBob SquarePants">SpongeBob SquarePants</option>
+                            <option value="Morgan Freeman">Morgan Freeman</option>
+                            <option value="Albert Einstein">Albert Einstein</option>
+                            <option value="Shakespeare">Shakespeare</option>
+                            <option value="Elmo">Elmo</option>
+                            <option value="Dumbledore">Dumbledore</option>
+                            <option value="Siri">Siri</option>
+                            <option value="Batman">Batman</option>
+                            <option value="Tinkerbell">Tinkerbell</option>
+                            <option value="Stephen Hawking">Stephen Hawking</option>
+                            <option value="Mr. Rogers">Mr. Rogers</option>
+                        </select>
+                    </div>
+
+
                     <div class="mb-3">
                         <label for="userMessage" class="form-label">Ask a question</label>
                         <textarea class="form-control" id="userMessage" name="message" rows="3" placeholder="Type your question here..." required></textarea>
@@ -48,8 +82,10 @@ ob_start();
 document.getElementById('promptForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
+    const gradeRange = document.getElementById('gradeRange').value.trim();
+    const subject = document.getElementById('subject').value.trim();
     const message = document.getElementById('userMessage').value.trim();
-    if (!message) return;
+    if (!gradeRange || !subject || !message) return;
 
     const tutor = document.getElementById('tutorSelect').value;
     const submitBtn = document.getElementById('submitBtn');
@@ -66,7 +102,11 @@ document.getElementById('promptForm').addEventListener('submit', function(e) {
     fetch('api_handler.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: message, tutor: tutor })
+        body: JSON.stringify({
+            gradeRange: gradeRange,
+            subject: subject,
+            message: message
+        })
     })
     .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
     .then(function(result) {
