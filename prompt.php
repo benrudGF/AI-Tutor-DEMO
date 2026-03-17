@@ -70,6 +70,9 @@ ob_start();
                     <div id="responseContent" class="p-3 bg-light rounded border" style="white-space: pre-wrap;"></div>
                     <div id="responseSummary" class="mt-2 text-muted fst-italic"></div>
                     <div id="responseConcepts" class="mt-2"></div>
+                    <div id="responseTokens" class="mt-2 text-muted small"></div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="debugBtn" style="display:none;" onclick="document.getElementById('debugPayload').style.display = document.getElementById('debugPayload').style.display === 'none' ? 'block' : 'none';">Show JSON Payload</button>
+                    <pre id="debugPayload" class="mt-2 p-3 bg-dark text-light rounded small" style="display:none; max-height:400px; overflow:auto;"></pre>
                 </div>
                 <div id="errorArea" class="mt-4" style="display:none;">
                     <div class="alert alert-danger" id="errorContent"></div>
@@ -134,6 +137,18 @@ document.getElementById('promptForm').addEventListener('submit', function(e) {
                 });
             }
             document.getElementById('responseConcepts').innerHTML = conceptsHtml;
+
+            var tokensSent = result.data.tokens_sent;
+            var tokensReceived = result.data.tokens_received;
+            var tokensHtml = '';
+            if (tokensSent !== null || tokensReceived !== null) {
+                tokensHtml = 'Tokens — Sent: ' + (tokensSent ?? 'N/A') + ' | Received: ' + (tokensReceived ?? 'N/A');
+            }
+            document.getElementById('responseTokens').textContent = tokensHtml;
+
+            document.getElementById('debugBtn').style.display = 'inline-block';
+            document.getElementById('debugPayload').style.display = 'none';
+            document.getElementById('debugPayload').textContent = JSON.stringify(result.data, null, 2);
 
             responseArea.style.display = 'block';
         } else {

@@ -158,20 +158,24 @@ logPromptRequest($pdo, array_merge($logParams, [
     'error_message'    => null,
 ]));
 
-if (!is_array($reply) || !isset($reply['answer'])) {
-    echo json_encode(['reply' => [
-        'answer'       => $replyRaw,
-        'topic'        => '',
-        'difficulty'   => '',
-        'key_concepts' => [],
-        'summary'      => '',
-    ]]);
-} else {
-    echo json_encode(['reply' => [
+$replyOutput = is_array($reply) && isset($reply['answer'])
+    ? [
         'answer'       => $reply['answer'] ?? '',
         'topic'        => $reply['topic'] ?? '',
         'difficulty'   => $reply['difficulty'] ?? '',
         'key_concepts' => $reply['key_concepts'] ?? [],
         'summary'      => $reply['summary'] ?? '',
-    ]]);
-}
+    ]
+    : [
+        'answer'       => $replyRaw,
+        'topic'        => '',
+        'difficulty'   => '',
+        'key_concepts' => [],
+        'summary'      => '',
+    ];
+
+echo json_encode([
+    'reply'           => $replyOutput,
+    'tokens_sent'     => $tokensSent,
+    'tokens_received' => $tokensReceived,
+]);
