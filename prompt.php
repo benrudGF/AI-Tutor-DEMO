@@ -66,7 +66,10 @@ ob_start();
                 </form>
                 <div id="responseArea" class="mt-4" style="display:none;">
                     <h5>Response:</h5>
+                    <div id="responseMeta" class="mb-2"></div>
                     <div id="responseContent" class="p-3 bg-light rounded border" style="white-space: pre-wrap;"></div>
+                    <div id="responseSummary" class="mt-2 text-muted fst-italic"></div>
+                    <div id="responseConcepts" class="mt-2"></div>
                 </div>
                 <div id="errorArea" class="mt-4" style="display:none;">
                     <div class="alert alert-danger" id="errorContent"></div>
@@ -110,7 +113,28 @@ document.getElementById('promptForm').addEventListener('submit', function(e) {
     .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
     .then(function(result) {
         if (result.ok && result.data.reply) {
-            responseContent.textContent = result.data.reply;
+            var reply = result.data.reply;
+            responseContent.textContent = reply.answer || '';
+
+            var metaHtml = '';
+            if (reply.topic) {
+                metaHtml += '<span class="badge bg-primary me-1">' + reply.topic + '</span>';
+            }
+            if (reply.difficulty) {
+                metaHtml += '<span class="badge bg-secondary me-1">' + reply.difficulty + '</span>';
+            }
+            document.getElementById('responseMeta').innerHTML = metaHtml;
+
+            document.getElementById('responseSummary').textContent = reply.summary || '';
+
+            var conceptsHtml = '';
+            if (reply.key_concepts && reply.key_concepts.length > 0) {
+                reply.key_concepts.forEach(function(concept) {
+                    conceptsHtml += '<span class="badge bg-info text-dark me-1">' + concept + '</span>';
+                });
+            }
+            document.getElementById('responseConcepts').innerHTML = conceptsHtml;
+
             responseArea.style.display = 'block';
         } else {
             errorContent.textContent = result.data.error || 'An unexpected error occurred.';

@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS prompt_requests (
+    id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id          INT NOT NULL,
+    session_id       VARCHAR(128) NOT NULL,
+    ip_address       VARCHAR(45) NOT NULL,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    grade_range      VARCHAR(50) NOT NULL,
+    subject          VARCHAR(50) NOT NULL,
+    voice            VARCHAR(100) NOT NULL,
+    user_prompt      TEXT NOT NULL,
+    groq_response    TEXT,
+    model_used       VARCHAR(100) NOT NULL,
+    tokens_sent      INT UNSIGNED DEFAULT NULL,
+    tokens_received  INT UNSIGNED DEFAULT NULL,
+    response_time_ms INT UNSIGNED DEFAULT NULL,
+    status           ENUM('success', 'error') NOT NULL DEFAULT 'success',
+    error_message    TEXT DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_created_at (created_at),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -36,6 +36,8 @@ AI-Tutor-DEMO is a PHP web application that provides an AI tutoring interface po
 ├── view_post.php        # Post viewing (stub — not yet implemented)
 ├── admin/
 │   └── dashboard.php    # Admin dashboard (stub — not yet implemented)
+├── migrations/
+│   └── 001_create_prompt_requests.sql  # prompt_requests table
 ├── attached_assets/     # Screenshots and media
 ├── .replit              # Replit run/deploy config
 ├── replit.nix           # Nix packages (php82)
@@ -81,6 +83,32 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL
 );
 ```
+
+The `prompt_requests` table tracks every AI prompt interaction:
+
+```sql
+CREATE TABLE IF NOT EXISTS prompt_requests (
+    id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id          INT NOT NULL,
+    session_id       VARCHAR(128) NOT NULL,
+    ip_address       VARCHAR(45) NOT NULL,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    grade_range      VARCHAR(50) NOT NULL,
+    subject          VARCHAR(50) NOT NULL,
+    voice            VARCHAR(100) NOT NULL,
+    user_prompt      TEXT NOT NULL,
+    groq_response    TEXT,
+    model_used       VARCHAR(100) NOT NULL,
+    tokens_sent      INT UNSIGNED DEFAULT NULL,
+    tokens_received  INT UNSIGNED DEFAULT NULL,
+    response_time_ms INT UNSIGNED DEFAULT NULL,
+    status           ENUM('success', 'error') NOT NULL DEFAULT 'success',
+    error_message    TEXT DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
+
+Migration file: `migrations/001_create_prompt_requests.sql`
 
 When adding new tables or columns, create them in the database directly and document the schema change here.
 
@@ -134,7 +162,21 @@ Key parameters sent to Groq:
 
 The frontend sends `{ gradeRange, subject, voice, message }` in the POST body. The backend uses all three selection fields to build a dynamic system prompt: `"You are a helpful AI tutor specializing in {subject} for {gradeRange} school students. Answer all questions in the voice of: {voice}."` To add a new voice, subject, or grade range, add a matching `<option>` in `prompt.php`.
 
-The response is returned as JSON to the frontend, which renders it dynamically via vanilla JS `fetch()`.
+The Groq API is configured with `response_format: { type: "json_object" }` to return structured JSON. The AI response includes these fields:
+
+```json
+{
+  "answer": "The full tutoring response",
+  "topic": "The specific topic addressed",
+  "difficulty": "beginner | intermediate | advanced",
+  "key_concepts": ["concept1", "concept2", "concept3"],
+  "summary": "One-line summary of the answer"
+}
+```
+
+The backend returns this as `{ "reply": { "answer": "...", "topic": "...", ... } }` to the frontend, which renders the answer with metadata badges (topic, difficulty, key concepts, summary).
+
+Every prompt request (success or error) is logged to the `prompt_requests` table with user info, timing, token counts, and the full request/response.
 
 ## Coding Conventions
 
